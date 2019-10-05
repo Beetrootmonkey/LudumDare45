@@ -12,17 +12,10 @@ mapW = 127
 visibleTiles={}
 
 function getPosAsKey(pos)
- -- printh("getPosAsString")
- -- printh(pos.x)
- -- printh(pos.y)
- -- return pos.x .. " " .. pos.y
  return pos.y * mapW + pos.x
 end
 
 function isTileVisible(pos)
- -- printh("isTileVisible")
- -- printh(pos.x)
- -- printh(pos.y)
  return visibleTiles[getPosAsKey(pos)] == true
 end
 
@@ -58,9 +51,6 @@ p={
     if (btn(down)) then self:tryMove({x=self.x, y=self.y+1}) end
 
     local tilePos = {x=flr(self.x/8), y=flr(self.y/8)}
-     -- printh("p.update")
-     -- printh(tilePos.x)
-     -- printh(tilePos.y)
     if(not isTileVisible(tilePos)) then
       printh("Revealing")
       revealTile(tilePos)
@@ -97,13 +87,10 @@ function _draw()
   cls()
   map(0,0,0,0,mapH,mapW)
 
-  for w=0,mapW do
-    for h=0,mapH do
-      local x,y = w*8,h*8
-       -- printh("_draw")
-       -- printh(x)
-       -- printh(y)
-      if not isTileVisible({x=w, y=h}) then
+  for tileX=0,mapW do
+    for tileY=0,mapH do
+      local x,y = tileX*8,tileY*8
+      if not isTileVisible({x=tileX, y=tileY}) then
        rectfill(x,y,x+7,y+7,black)
       end
     end
