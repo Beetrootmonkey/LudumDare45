@@ -17,53 +17,84 @@ function revealTile(pos)
  mset(pos.x + 16, pos.y, 0)
 end
 
-p={
- x=36,
- y=36,
- move=function(self, newPos)
-  self.x = newPos.x
-  self.y = newPos.y
- end,
- canMove=function(self, newPos)
-  for i=1,#self.collisionBox do
-   local coord = self.collisionBox[i]
-   local tile = mget((newPos.x + coord.x) / 8, (newPos.y + coord.y) / 8)
-   local isWall = fget(tile, 0) --TRUE auf Flag 0 bedeutet WAND
-   if isWall then return false end
-  end
-  return true
- end,
- tryMove=function(self, newPos)
-  if self:canMove(newPos) then self:move(newPos) end
- end,
- update=function(self, newPos)
-    if (btn(left)) then self:tryMove({x=self.x-1, y=self.y}) end
-    if (btn(right)) then self:tryMove({x=self.x+1, y=self.y}) end
-    if (btn(up)) then self:tryMove({x=self.x, y=self.y-1}) end
-    if (btn( down)) then self:tryMove({x=self.x, y=self.y+1}) end
+function createPlayer()
+ return {
+  x=36,
+  y=36,
+  move=function(self, newPos)
+   self.x = newPos.x
+   self.y = newPos.y
+  end,
+  canMove=function(self, newPos)
+   for i=1,#self.collisionBox do
+    local coord = self.collisionBox[i]
+    local tile = mget((newPos.x + coord.x) / 8, (newPos.y + coord.y) / 8)
+    local isWall = fget(tile, 0) --TRUE auf Flag 0 bedeutet WAND
+    if isWall then return false end
+   end
+   return true
+  end,
+  tryMove=function(self, newPos)
+   if self:canMove(newPos) then self:move(newPos) end
+  end,
+  update=function(self, newPos)
+   local dir = {x=0,y=0}
+     if btn(left) then
+     dir.x = -1
+     elseif btn(right) then
+      dir.x = 1
+     end
+     if btn(up) then
+      dir.y = -1
+     elseif btn( down) then
+      dir.y = 1
+     end
 
-    for i=-1,1 do
-         for j=-1,1 do
-         local tilePos = {x=flr(self.x/8) + i, y=flr(self.y/8) + j}
-         revealTile(tilePos)
-         end
-    end
- end,
- draw=function(self)
-  pset(self.x, self.y, red)
-  for i=1,#self.collisionBox do
-   local coord = self.collisionBox[i]
-   pset(self.x + coord.x, self.y + coord.y, white)
-  end
-  print(self.x .. " " .. self.y,0,0,7)
- end,
- collisionBox={
-  {x=-2, y=-2},
-  {x= 2, y=-2},
-  {x=-2, y= 2},
-  {x= 2, y= 2}
+     if not (dir.x == 0 and dir.y == 0) then
+      self.direction = dir
+      local newPos = {x=self.x+dir.x, y=self.y+dir.y}
+      local newPosX = {x=self.x+dir.x, y=self.y}
+      local newPosY = {x=self.x, y=self.y+dir.y}
+      if self:canMove(newPos) then
+       self:move(newPos)
+      elseif self:canMove(newPosX) then
+       self:move(newPosX)
+      elseif self:canMove(newPosY) then
+       self:move(newPosY)
+      end
+     end
+
+     for i=-1,1 do
+          for j=-1,1 do
+          local tilePos = {x=flr(self.x/8) + i, y=flr(self.y/8) + j}
+          revealTile(tilePos)
+          end
+     end
+  end,
+  draw=function(self)
+   pset(self.x, self.y, red)
+   for i=1,#self.collisionBox do
+    local coord = self.collisionBox[i]
+    pset(self.x + coord.x, self.y + coord.y, white)
+   end
+   for i=1,3 do
+    pset(self.x + self.direction.x * i, self.y + self.direction.y * i, green)
+   end
+   print(self.x .. " " .. self.y,0,0,7)
+  end,
+  collisionBox={
+   {x=-2, y=-2},
+   {x= 2, y=-2},
+   {x=-2, y= 2},
+   {x= 2, y= 2}
+  },
+  direction={x=0,y=1}
  }
-}
+end
+
+p=createPlayer()
+projectile=createPlayer()
+projectile.update=function(self) end
 
 function _init()
 
