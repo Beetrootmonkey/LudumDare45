@@ -6,8 +6,8 @@ Small game made with Pico-8.
 
 ## Authors
 
-[Beetrootmonkey](https://github.com/Beetrootmonkey)
+-   [Beetrootmonkey](https://github.com/Beetrootmonkey)
 
-Nobosaurus
+-   Nobosaurus
 
-Bockwurstboy
+-   Bockwurstboy
