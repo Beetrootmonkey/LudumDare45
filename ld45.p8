@@ -103,8 +103,10 @@ function createProjectile(x, y, dir)
  local projectile = createPlayer()
  projectile.x = x
  projectile.y = y
+ projectile.isAlive = true
  projectile.speed = 2
- projectile.id = #projectiles+1
+ projectilesCounter += 1
+ projectile.id = projectilesCounter
  projectile.collisionBox={
   {x=-1, y=-1},
   {x= 1, y=-1},
@@ -118,7 +120,7 @@ function createProjectile(x, y, dir)
     revealTile(tilePos)
    end
   end
-  projectiles[projectile.id] = nil
+  projectile.isAlive = false
  end
  projectile.draw=function(self)
   pset(self.x, self.y, red)
@@ -139,6 +141,7 @@ end
 
 p=createPlayer()
 projectiles={}
+projectilesCounter=0
 
 
 
@@ -149,8 +152,16 @@ end
 function _update()
 
   p:update()
+  local idsToRemove={}
   for projectile in all(projectiles) do
-   if (projectile ~= nil) then projectile:update() end
+   if (projectile ~= 0) then
+    projectile:update()
+    if not projectile.isAlive then idsToRemove[#idsToRemove + 1] = projectile.id end
+   end
+  end
+
+  for id in all(idsToRemove) do
+   projectiles[id] = 0
   end
 
   if btnp(fire1) then
@@ -165,8 +176,25 @@ function _draw()
 
   p:draw()
   for projectile in all(projectiles) do
-    if (projectile ~= nil) then projectile:draw() end
+    if (projectile ~= 0) then projectile:draw() end
   end
+  local count = 0
+  for projectile in all(projectiles) do
+    if (projectile ~= 0) then count+=1 end
+  end
+  local countAlive = 0
+  for projectile in all(projectiles) do
+    if (projectile ~= 0 and projectile.isAlive) then countAlive+=1 end
+  end
+  local countDead = 0
+  for projectile in all(projectiles) do
+    if (projectile ~= 0 and not projectile.isAlive) then countDead+=1 end
+  end
+  print(count,0,6,7)
+  print(projectilesCounter,0,12,7)
+  print(#projectiles,0,18,7)
+  print(countAlive,0,24,7)
+  print(countDead,0,30,7)
 end
 
 
