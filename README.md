@@ -1,7 +1,5 @@
 # LudumDare45
 
 ```
-function penetration() {
-    penis.stossen();
-}
+Small game made with Pico-8.
 ```
