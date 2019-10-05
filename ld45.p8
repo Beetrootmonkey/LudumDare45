@@ -21,6 +21,7 @@ function createPlayer()
  return {
   x=36,
   y=36,
+  speed=1,
   move=function(self, newPos)
    self.x = newPos.x
    self.y = newPos.y
@@ -37,38 +38,44 @@ function createPlayer()
   tryMove=function(self, newPos)
    if self:canMove(newPos) then self:move(newPos) end
   end,
-  update=function(self, newPos)
+  getDirection=function(self)
    local dir = {x=0,y=0}
-     if btn(left) then
-     dir.x = -1
-     elseif btn(right) then
-      dir.x = 1
-     end
-     if btn(up) then
-      dir.y = -1
-     elseif btn( down) then
-      dir.y = 1
-     end
+   if btn(left) then
+   dir.x = -1
+   elseif btn(right) then
+    dir.x = 1
+   end
+   if btn(up) then
+    dir.y = -1
+   elseif btn( down) then
+    dir.y = 1
+   end
 
-     if not (dir.x == 0 and dir.y == 0) then
+   return dir
+  end,
+  onCollision=function(self, other) end,
+  update=function(self, newPos)
+     local dir = self:getDirection()
+     if not(dir.x == 0 and dir.y == 0) then
       self.direction = dir
-      local newPos = {x=self.x+dir.x, y=self.y+dir.y}
-      local newPosX = {x=self.x+dir.x, y=self.y}
-      local newPosY = {x=self.x, y=self.y+dir.y}
-      if self:canMove(newPos) then
-       self:move(newPos)
-      elseif self:canMove(newPosX) then
-       self:move(newPosX)
-      elseif self:canMove(newPosY) then
-       self:move(newPosY)
-      end
-     end
 
-     for i=-1,1 do
-          for j=-1,1 do
-          local tilePos = {x=flr(self.x/8) + i, y=flr(self.y/8) + j}
-          revealTile(tilePos)
-          end
+      for i=1,self.speed do
+       local newPos = {x=self.x+dir.x, y=self.y+dir.y}
+       local newPosX = {x=self.x+dir.x, y=self.y}
+       local newPosY = {x=self.x, y=self.y+dir.y}
+       if not self:canMove(newPos) then
+        self:onCollision()
+       end
+       if self:canMove(newPos) then
+        self:move(newPos)
+       elseif self:canMove(newPosX) then
+        self:move(newPosX)
+       elseif self:canMove(newPosY) then
+        self:move(newPosY)
+       else
+        break
+       end
+      end
      end
   end,
   draw=function(self)
@@ -92,9 +99,48 @@ function createPlayer()
  }
 end
 
+function createProjectile(x, y, dir)
+ local projectile = createPlayer()
+ projectile.x = x
+ projectile.y = y
+ projectile.speed = 2
+ projectile.id = #projectiles+1
+ projectile.collisionBox={
+  {x=-1, y=-1},
+  {x= 1, y=-1},
+  {x=-1, y= 1},
+  {x= 1, y= 1}
+ }
+ projectile.onCollision=function(self)
+  for i=-1,1 do
+   for j=-1,1 do
+    local tilePos = {x=flr(projectile.x/8) + i, y=flr(projectile.y/8) + j}
+    revealTile(tilePos)
+   end
+  end
+  projectiles[projectile.id] = nil
+ end
+ projectile.draw=function(self)
+  pset(self.x, self.y, red)
+  for i=1,#self.collisionBox do
+   local coord = self.collisionBox[i]
+   pset(self.x + coord.x, self.y + coord.y, white)
+  end
+  for i=1,3 do
+   pset(self.x + self.direction.x * i, self.y + self.direction.y * i, green)
+  end
+ end
+ projectile.direction = {x=dir.x,y=dir.y}
+ projectile.getDirection=function(self)
+  return self.direction
+ end
+ projectiles[projectile.id] = projectile
+end
+
 p=createPlayer()
-projectile=createPlayer()
-projectile.update=function(self) end
+projectiles={}
+
+
 
 function _init()
 
@@ -103,6 +149,13 @@ end
 function _update()
 
   p:update()
+  for projectile in all(projectiles) do
+   if (projectile ~= nil) then projectile:update() end
+  end
+
+  if btnp(fire1) then
+   createProjectile(p.x, p.y, p.direction)
+  end
 end
 
 function _draw()
@@ -111,6 +164,9 @@ function _draw()
   map(16,0,0,0,mapH,mapW)
 
   p:draw()
+  for projectile in all(projectiles) do
+    if (projectile ~= nil) then projectile:draw() end
+  end
 end
 
 
