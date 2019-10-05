@@ -6,6 +6,30 @@ __lua__
 left,right,up,down,fire1,fire2=0,1,2,3,4,5
 black,dark_blue,dark_purple,dark_green,brown,dark_gray,light_gray,white,red,orange,yellow,green,blue,indigo,pink,peach=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 
+mapH = 127
+mapW = 127
+
+visibleTiles={}
+
+function getPosAsKey(pos)
+ -- printh("getPosAsString")
+ -- printh(pos.x)
+ -- printh(pos.y)
+ -- return pos.x .. " " .. pos.y
+ return pos.y * mapW + pos.x
+end
+
+function isTileVisible(pos)
+ -- printh("isTileVisible")
+ -- printh(pos.x)
+ -- printh(pos.y)
+ return visibleTiles[getPosAsKey(pos)] == true
+end
+
+function revealTile(pos)
+ visibleTiles[getPosAsKey(pos)] = true
+end
+
 p={
  x=36,
  y=36,
@@ -28,10 +52,21 @@ p={
   if self:canMove(newPos) then self:move(newPos) end
  end,
  update=function(self, newPos)
-    if (btn(left)) then self:tryMove({x=p.x-1, y=p.y}) end
-    if (btn(right)) then self:tryMove({x=p.x+1, y=p.y}) end
-    if (btn(up)) then self:tryMove({x=p.x, y=p.y-1}) end
-    if (btn(down)) then self:tryMove({x=p.x, y=p.y+1}) end
+    if (btn(left)) then self:tryMove({x=self.x-1, y=self.y}) end
+    if (btn(right)) then self:tryMove({x=self.x+1, y=self.y}) end
+    if (btn(up)) then self:tryMove({x=self.x, y=self.y-1}) end
+    if (btn(down)) then self:tryMove({x=self.x, y=self.y+1}) end
+
+    local tilePos = {x=flr(self.x/8), y=flr(self.y/8)}
+     -- printh("p.update")
+     -- printh(tilePos.x)
+     -- printh(tilePos.y)
+    if(not isTileVisible(tilePos)) then
+      printh("Revealing")
+      revealTile(tilePos)
+     else
+      printh("Already visible")
+    end
  end,
  draw=function(self)
   pset(self.x, self.y, red)
@@ -39,9 +74,6 @@ p={
    local coord = self.collisionBox[i]
    pset(self.x + coord.x, self.y + coord.y, white)
   end
-
-  local tile = mget(self.x / 8, self.y / 8)
-  local isWall = fget(tile, 0) --TRUE auf Flag 0 bedeutet WAND
   print(self.x .. " " .. self.y,0,0,7)
  end,
  collisionBox={
@@ -54,30 +86,26 @@ p={
 
 function _init()
 
-  mapH = 127
-  mapW = 127
-
 end
 
 function _update()
 
   p:update()
-
-  local spriteId = mget(nx,ny)
-  if(fget(spriteId, 0)) then
-    fset(spriteId, 1, true)
-  end
 end
 
 function _draw()
   cls()
   map(0,0,0,0,mapH,mapW)
 
-
   for w=0,mapW do
     for h=0,mapH do
       local x,y = w*8,h*8
-      --rectfill(x,y,x+7,y+7,black)
+       -- printh("_draw")
+       -- printh(x)
+       -- printh(y)
+      if not isTileVisible({x=w, y=h}) then
+       rectfill(x,y,x+7,y+7,black)
+      end
     end
   end
 
