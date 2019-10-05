@@ -1,6 +1,6 @@
 # LudumDare45
 
-![placeholder](https://https://github.com/Beetrootmonkey/LudumDare45/tree/dev/favicon.ico)
+![placeholder](https://raw.githubusercontent.com/Beetrootmonkey/LudumDare45/master/favicon.ico)
 
 ```
 Small game made with Pico-8.
