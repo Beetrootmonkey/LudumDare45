@@ -9,21 +9,12 @@ black,dark_blue,dark_purple,dark_green,brown,dark_gray,light_gray,white,red,oran
 mapH = 127
 mapW = 127
 
-visibleTiles={}
-
-function getPosAsKey(pos)
- return pos.y * mapW + pos.x
-  -- return pos.x .. " " .. pos.y
-end
-
 function isTileVisible(pos)
  return not mget(pos.x + 16, pos.y) == 3
- -- return visibleTiles[getPosAsKey(pos)] == true
 end
 
 function revealTile(pos)
  mset(pos.x + 16, pos.y, 0)
- -- visibleTiles[getPosAsKey(pos)] = true
 end
 
 p={
@@ -89,15 +80,6 @@ function _draw()
   cls()
   map(0,0,0,0,mapH,mapW)
   map(16,0,0,0,mapH,mapW)
-
-  -- for tileX=0,mapW do
-  --   for tileY=0,mapH do
-  --     local x,y = tileX*8,tileY*8
-  --     if not isTileVisible({x=tileX, y=tileY}) then
-  --      rectfill(x,y,x+7,y+7,black)
-  --     end
-  --   end
-  -- end
 
   p:draw()
 end
