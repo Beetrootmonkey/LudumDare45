@@ -1,7 +1,7 @@
 # LudumDare45
 
-'''
+```
 function penetration() {
-penis.stossen();
+    penis.stossen();
 }
-'''
+```
