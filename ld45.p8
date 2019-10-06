@@ -40,19 +40,30 @@ function createPlayer()
   end,
   getDirection=function(self)
    local dir = {x=0,y=0}
+   local isWalking = false
    if btn(left) then
    dir.x = -1
    self.lookingRight = false
+   isWalking = true
    elseif btn(right) then
     dir.x = 1
     self.lookingRight = true
+    isWalking = true
    end
    if btn(up) then
     dir.y = -1
     self.lookingDown = false
+    isWalking = true
    elseif btn( down) then
     dir.y = 1
     self.lookingDown = true
+    isWalking = true
+   end
+
+   if isWalking then
+    self.walking %= 4
+   else
+    self.waling = 0
    end
 
    return dir
@@ -72,18 +83,13 @@ function createPlayer()
        end
        if self:canMove(newPos) then
         self:move(newPos)
-        self.walking += 0.5
        elseif self:canMove(newPosX) then
         self:move(newPosX)
-        self.walking += 0.5
        elseif self:canMove(newPosY) then
         self:move(newPosY)
-        self.walking += 0.5
        else
-       self.walking = 0
         break
        end
-       self.walking %= 4
       end
      end
   end,
