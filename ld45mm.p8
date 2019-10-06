@@ -24,7 +24,7 @@ function _init()
  createOption({label="tutorial", onClick=loadGame("tutorial")})
  createOption({label="normal", onClick=loadGame("normal")})
  createOption({label="hardcore", disabled=true, onClick=loadGame("hardcore")})
- createOption({label="exit", onClick=function() extcmd("shutdown") end, offset = 12})
+ createOption({label="exit", onClick=function() extcmd("shutdown") end, offset = 16})
 end
 
 function createOption(props)
@@ -55,12 +55,13 @@ function _draw()
  cls()
  rectfill(0, 0, mapW, mapH, dark_blue)
  map(0,0,0,0,mapW,mapH)
-
+ local lastOffset = offsetY
  for i=1,#options do
   local option = options[i]
   local w = #(option.label) * 4 - 1
   local x = offsetX - flr(w / 2)
-  local y = offsetY + i * option.offset
+  local y = lastOffset + option.offset
+  lastOffset = y
 
   if i - 1 == focusedOption then
    rectfill(x - 1, y - 1, x + w, y + 5, blue)
