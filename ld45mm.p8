@@ -55,7 +55,7 @@ function _update()
  end
  focusedOption %= #options
 
- if btnp(fire1) or btn(fire2) then
+ if btnp(fire1) or btnp(fire2) then
   options[focusedOption + 1]:onClick()
  end
 
