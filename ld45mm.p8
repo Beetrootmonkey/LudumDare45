@@ -8,31 +8,59 @@ black,dark_blue,dark_purple,dark_green,brown,dark_gray,light_gray,white,red,oran
 
 mapH = 127
 mapW = 127
-option = 0
+focusedOption = 0
+offsetX = 64
+offsetY = 50
+offsetPerOption = 10
 
 function _init()
+ options = {}
+ createOption({label="tutorial"})
+ createOption({label="normal"})
+ createOption({label="harcore", disabled=true})
+end
 
+function createOption(props)
+ local option = {
+  label = props.label,
+  name = props.name or props.label,
+  disabled = props.disabled or false
+ }
+ options[#options + 1] = option
 end
 
 
 function _update()
- if btnp(up) then option -= 1 end
- if btnp(down) then option += 1 end
- option %= 3
+ if btnp(up) then focusedOption -= 1 end
+ if btnp(down) then focusedOption += 1 end
+ focusedOption %= 3
 
-if btn(fire1) or btn(fire2) then load("ld45", "main menu") end
+ if btn(fire1) or btn(fire2) then load("ld45", "main menu") end
 
 end
 
 function _draw()
  cls()
- --map(0,0,0,0,mapH,mapW)
+ rectfill(0, 0, mapW, mapH, dark_blue)
+ map(0,0,0,0,mapW,mapH)
 
- rectfill(43, 63 + option * 10, 83, 69 + option * 10, blue)
+ for i=1,#options do
+  local option = options[i]
+  local w = #(option.label) * 4 - 1
+  local x = offsetX - flr(w / 2)
+  local y = offsetY + i * offsetPerOption
 
- print("option 1", 44, 64, white)
- print("option 2", 44, 74, white)
- print("option 3", 44, 84, white)
+  if i - 1 == focusedOption then
+   rectfill(x - 1, y - 1, x + w, y + 5, blue)
+  end
+
+  local color = white
+  if option.disabled then color = light_gray end
+
+  print(option.label, x, y, white)
+ end
+
+ print(focusedOption, 1, 1, white)
 end
 
 
