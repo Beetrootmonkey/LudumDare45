@@ -32,7 +32,12 @@ function createOption(props)
   label = props.label,
   disabled = props.disabled or false,
   onClick = function(self)
-   if not self.disabled then props.onClick() end
+   if not self.disabled then
+    -- props.onClick()
+    sfx(1)
+   else
+   sfx(2)
+   end
   end,
   offset = props.offset or offsetPerOption
  }
@@ -41,11 +46,16 @@ end
 
 
 function _update()
- if btnp(up) then focusedOption -= 1 end
- if btnp(down) then focusedOption += 1 end
+ if btnp(up) then
+  focusedOption -= 1
+  sfx(0)
+ elseif btnp(down) then
+  focusedOption += 1
+  sfx(0)
+ end
  focusedOption %= #options
 
- if btn(fire1) or btn(fire2) then
+ if btnp(fire1) or btn(fire2) then
   options[focusedOption + 1]:onClick()
  end
 
@@ -75,8 +85,7 @@ function _draw()
 end
 
 
-__gfx__
-__gff__
-__map__
 __sfx__
-__music__
+000100002a0401b0100e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000400000b05008040050300403002020000100500005000020000100016000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000400000b05008040050300403002020000100500005000020000100016000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
