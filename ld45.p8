@@ -40,6 +40,7 @@ function createPlayer()
   y=36,
   speed=1,
   move=function(self, newPos)
+   printh("MOVE " .. newPos.x .. "," .. newPos.y)
    self.x = newPos.x
    self.y = newPos.y
   end,
@@ -101,9 +102,9 @@ function createPlayer()
        end
        if self:canMove(newPos) then
         self:move(newPos)
-       elseif self:canMove(newPosX) then
+       elseif self:canMove(newPosX) and dir.x ~= 0 then
         self:move(newPosX)
-       elseif self:canMove(newPosY) then
+       elseif self:canMove(newPosY) and dir.y ~= 0 then
         self:move(newPosY)
        else
         break
