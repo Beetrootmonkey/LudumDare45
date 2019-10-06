@@ -33,7 +33,7 @@ function createOption(props)
   disabled = props.disabled or false,
   onClick = function(self)
    if not self.disabled then
-    -- props.onClick()
+    props.onClick()
     sfx(1)
    else
    sfx(2)
