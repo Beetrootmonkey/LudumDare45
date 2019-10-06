@@ -172,7 +172,7 @@ function createPlayer(x, y)
       end
      end
   end,
-  offset={x=-3,y=-5},
+  offset={x=-3,y=-4},
   draw=function(self)
 
   if self.lookingRight then
@@ -454,15 +454,20 @@ end
    if (projectile ~= 0) then projectile:draw() end
  end
 
- rectfill(cameraX, cameraY, cameraX + 127, cameraY + 12, white)
-  rectfill(cameraX, cameraY + 13, cameraX + 127, cameraY + 13, black)
+ rectfill(cameraX, cameraY, cameraX + 127, cameraY + 12, black)
+ -- rectfill(cameraX, cameraY + 13, cameraX + 127, cameraY + 13, black)
 
  print("$ " .. padStart(p.score, 6), cameraX + 1, cameraY + 1, getColorByLevel(p.level))
  -- print(padStart("", p.ammo, "|"), cameraX + 1, cameraY + 7, getColorByLevel(p.level))
- print("p", cameraX + 1, cameraY + 7, getColorByLevel(p.level))
- for i=1,p.ammo do
-  line(cameraX + 8 + i, cameraY + 7, cameraX + 8 + i, cameraY + 11)
+  print("p", cameraX + 1, cameraY + 7, getColorByLevel(p.level))
+ if p.ammo > 0 then
+  for i=1,p.ammo do
+   line(cameraX + 8 + i, cameraY + 7, cameraX + 8 + i, cameraY + 11)
+  end
+ else
+  print("no paint", cameraX + 9, cameraY + 7, getColorByLevel(p.level))
  end
+
  print(getTimeAsString(), cameraX + 108, cameraY + 1, getColorByLevel(p.level))
 end
 
