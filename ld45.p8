@@ -168,6 +168,7 @@ function createProjectile(x, y, dir, level)
  projectile.y = y
  projectile.isAlive = true
  projectile.speed = 2
+ projectile.spawnPoint = {x=x,y=y}
  projectile.level = level
  projectile.collisionBox={
   {x=-1, y=-1},
@@ -185,6 +186,13 @@ function createProjectile(x, y, dir, level)
   projectile.isAlive = false
  end
  projectile.update=function(self, newPos)
+  local range = 2 --Reichweite in Tiles
+  if abs(self.x - self.spawnPoint.x) > range * 8 or abs(self.y - self.spawnPoint.y) > range * 8 then
+   self.isAlive = false
+   self:onCollision()
+   return
+  end
+
     local dir = self:getDirection()
     if not(dir.x == 0 and dir.y == 0) then
      self.direction = dir
@@ -194,9 +202,8 @@ function createProjectile(x, y, dir, level)
       local newPosX = {x=self.x+dir.x, y=self.y}
       local newPosY = {x=self.x, y=self.y+dir.y}
 
-      
-       local tilePos = {x=flr(self.x/8), y=flr(self.y/8)}
-       revealTile(tilePos, self.level)
+      -- local tilePos = {x=flr(self.x/8), y=flr(self.y/8)}
+      -- revealTile(tilePos, self.level)
 
       if not self:canMove(newPos) then
        self:onCollision()
