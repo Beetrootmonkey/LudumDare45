@@ -431,7 +431,7 @@ function _update()
    key, value = next(items, key)
   end
 
-  if btnp(fire1) and p.ammo > 0 and p.isAlive then
+  if btnp(fire1) and p.ammo > 0 and p.deathTime == nil then
    p.ammo -= 1
    createProjectile(p.x, p.y, p.direction, p.level)
   end
