@@ -44,6 +44,7 @@ function createPlayer()
   x=36,
   y=36,
   speed=1,
+  ammo=0,
   lastMoveSfx = 0,
   move=function(self, newPos)
    self.x = newPos.x
@@ -164,7 +165,7 @@ function createPlayer()
   lookingRight=true,
   lookingDown=true,
   walking=0,
-  level=-1
+  level=0
  }
 end
 
@@ -266,6 +267,7 @@ function createPowerup(x, y, level)
   onCollision=function(self, other)
    if self.level > other.level then other.level = self.level end
    self.isAlive = false
+   other.ammo += 10
    sfx(1)
   end,
   draw=function(self)
@@ -315,7 +317,8 @@ function _update()
    key, value = next(items, key)
   end
 
-  if btnp(fire1) and p.level >= 0 then
+  if btnp(fire1) and p.ammo > 0 then
+   p.ammo -= 1
    createProjectile(p.x, p.y, p.direction, p.level)
   end
 end
@@ -348,8 +351,8 @@ end
    if (projectile ~= 0) then projectile:draw() end
  end
 
- print(p.x .. " " .. p.y, cameraX, cameraY, green)
- print("Level:" .. p.level, cameraX, cameraY + 6, green)
+ print("ammo:" .. p.ammo, cameraX, cameraY, green)
+ print("level:" .. p.level, cameraX, cameraY + 6, green)
 end
 
 
