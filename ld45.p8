@@ -213,6 +213,18 @@ function createPlayer(x, y)
  }
 end
 
+function getColorByLevel(level)
+ local color = blue
+ if level == 1 then
+  color = green
+ elseif level == 2 then
+  color = red
+ elseif level == 3 then
+  color = yellow
+ end
+ return color
+end
+
 function createProjectile(x, y, dir, level)
  local projectile = createPlayer()
  projectile.x = x
@@ -278,14 +290,7 @@ function createProjectile(x, y, dir, level)
     end
  end
  projectile.draw=function(self)
-  local color = blue
-  if self.level == 1 then
-   color = green
-  elseif self.level == 2 then
-   color = red
-  elseif self.level == 3 then
-   color = yellow
-  end
+  local color = getColorByLevel(self.level)
   rectfill(self.x - 1, self.y - 1, self.x + 1, self.y + 1, color)
   -- for i=1,#self.collisionBox do
   --  local coord = self.collisionBox[i]
@@ -371,12 +376,12 @@ function _init()
  p = createPlayer(spawn.x * 8 + 4, spawn.y * 8 + 4)
 end
 
-function padStart(text, length)
+function padStart(text, length, char)
   local diff = length - #tostr(text)
   if diff <= 0 then return text end
   local s = ""
   for i = 1, diff do
-    s = s .. 0
+    s = s .. (char or 0)
   end
   s = s .. text
   return s
@@ -416,6 +421,13 @@ function _update()
   end
 end
 
+function getTimeAsString()
+ local secs = flr(t())
+ local mins = flr(secs / 60)
+ secs -= mins * 60
+ return padStart(mins, 2) .. ":" .. padStart(secs, 2)
+end
+
 function _draw()
  cls()
  map(0,0,0,0,mapH,mapW)
@@ -436,17 +448,22 @@ for j=flr((cameraY) / 8), flr((cameraY + 128) / 8) do
  end
 end
 
---map(16,0,0,0,mapH,mapW)
-
  p:draw()
  for i=1,#projectiles do
   local projectile = projectiles[i]
    if (projectile ~= 0) then projectile:draw() end
  end
 
- print("score:" .. padStart(p.score, 6), cameraX, cameraY, black)
- print("ammo :" .. padStart(p.ammo, 6), cameraX, cameraY + 6, black)
- print("level:" .. p.level, cameraX, cameraY + 12, black)
+ rectfill(cameraX, cameraY, cameraX + 127, cameraY + 12, white)
+  rectfill(cameraX, cameraY + 13, cameraX + 127, cameraY + 13, black)
+
+ print("$ " .. padStart(p.score, 6), cameraX + 1, cameraY + 1, getColorByLevel(p.level))
+ -- print(padStart("", p.ammo, "|"), cameraX + 1, cameraY + 7, getColorByLevel(p.level))
+ print("p", cameraX + 1, cameraY + 7, getColorByLevel(p.level))
+ for i=1,p.ammo do
+  line(cameraX + 8 + i, cameraY + 7, cameraX + 8 + i, cameraY + 11)
+ end
+ print(getTimeAsString(), cameraX + 108, cameraY + 1, getColorByLevel(p.level))
 end
 
 
@@ -532,7 +549,7 @@ __map__
 500000000000000000006a020233025000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 507900007a007900000050020202026900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 5050790000000000000050005069696900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-5050505078000000000000685050505000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+5050505078000000000000585050505000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 5050505050505000000050505050505000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 50505050507079797a7979705050505000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
