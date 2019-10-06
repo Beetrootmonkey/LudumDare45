@@ -17,12 +17,21 @@ end
 
 function isTileVisible(pos)
  return visibleTiles[getKeyFromPos(pos)] == true
- -- return not mget(pos.x + 16, pos.y) == 3
 end
 
 function revealTile(pos)
- visibleTiles[getKeyFromPos(pos)] = true
- -- mset(pos.x + 16, pos.y, 0)
+ local tile = mget(pos.x, pos.y)
+ if tile == nil then
+  return
+ end
+
+ local lvl = 0
+ if fget(tile, 1) then lvl += 1 end
+ if fget(tile, 2) then lvl += 2 end
+
+ if p.level >= lvl then
+  visibleTiles[getKeyFromPos(pos)] = true
+ end
 end
 
 function createPlayer()
@@ -236,7 +245,7 @@ end
  end
 
  print(p.x .. " " .. p.y, cameraX, cameraY, green)
- print("Level: " .. p.level, cameraX, cameraY + 6, green)
+ print("Level:" .. p.level, cameraX, cameraY + 6, green)
 end
 
 
