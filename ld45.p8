@@ -42,13 +42,17 @@ function createPlayer()
    local dir = {x=0,y=0}
    if btn(left) then
    dir.x = -1
+   self.lookingRight = false
    elseif btn(right) then
     dir.x = 1
+    self.lookingRight = true
    end
    if btn(up) then
     dir.y = -1
+    self.lookingDown = false
    elseif btn( down) then
     dir.y = 1
+    self.lookingDown = true
    end
 
    return dir
@@ -68,25 +72,46 @@ function createPlayer()
        end
        if self:canMove(newPos) then
         self:move(newPos)
+        self.walking += 0.5
        elseif self:canMove(newPosX) then
         self:move(newPosX)
+        self.walking += 0.5
        elseif self:canMove(newPosY) then
         self:move(newPosY)
+        self.walking += 0.5
        else
+       self.walking = 0
         break
        end
+       self.walking %= 4
       end
      end
   end,
+  offset={x=-3,y=-5},
   draw=function(self)
-   pset(self.x, self.y, red)
-   for i=1,#self.collisionBox do
-    local coord = self.collisionBox[i]
-    pset(self.x + coord.x, self.y + coord.y, white)
+
+  if self.lookingRight then
+   if self.lookingDown then
+    spr(21 + flr(self.walking), self.x + self.offset.x, self.y + self.offset.y)
+   else
+    spr(37 + flr(self.walking), self.x + self.offset.x, self.y + self.offset.y)
    end
-   for i=1,3 do
-    pset(self.x + self.direction.x * i, self.y + self.direction.y * i, green)
+  else
+   if self.lookingDown then
+    spr(21 + flr(self.walking), self.x + self.offset.x - 1, self.y + self.offset.y, 1, 1, true)
+   else
+    spr(37 + flr(self.walking), self.x + self.offset.x - 1, self.y + self.offset.y, 1, 1, true)
    end
+  end
+
+   -- pset(self.x, self.y, red)
+   -- for i=1,#self.collisionBox do
+   --  local coord = self.collisionBox[i]
+   --  pset(self.x + coord.x, self.y + coord.y, white)
+   -- end
+   -- for i=1,3 do
+   --  pset(self.x + self.direction.x * i, self.y + self.direction.y * i, green)
+   -- end
    print(self.x .. " " .. self.y,0,0,7)
   end,
   collisionBox={
@@ -95,7 +120,10 @@ function createPlayer()
    {x=-2, y= 2},
    {x= 2, y= 2}
   },
-  direction={x=0,y=1}
+  direction={x=0,y=1},
+  lookingRight=true,
+  lookingDown=true,
+  walking=0
  }
 end
 
@@ -105,8 +133,6 @@ function createProjectile(x, y, dir)
  projectile.y = y
  projectile.isAlive = true
  projectile.speed = 2
- projectilesCounter += 1
- projectile.id = projectilesCounter
  projectile.collisionBox={
   {x=-1, y=-1},
   {x= 1, y=-1},
@@ -123,25 +149,24 @@ function createProjectile(x, y, dir)
   projectile.isAlive = false
  end
  projectile.draw=function(self)
-  pset(self.x, self.y, red)
-  for i=1,#self.collisionBox do
-   local coord = self.collisionBox[i]
-   pset(self.x + coord.x, self.y + coord.y, white)
-  end
-  for i=1,3 do
-   pset(self.x + self.direction.x * i, self.y + self.direction.y * i, green)
-  end
+  rectfill(self.x - 1, self.y - 1, self.x + 1, self.y + 1, red)
+  -- for i=1,#self.collisionBox do
+  --  local coord = self.collisionBox[i]
+  --  pset(self.x + coord.x, self.y + coord.y, white)
+  -- end
+  -- for i=1,3 do
+  --  pset(self.x + self.direction.x * i, self.y + self.direction.y * i, green)
+  -- end
  end
  projectile.direction = {x=dir.x,y=dir.y}
  projectile.getDirection=function(self)
   return self.direction
  end
- projectiles[projectile.id] = projectile
+ projectiles[#projectiles + 1] = projectile
 end
 
 p=createPlayer()
 projectiles={}
-projectilesCounter=0
 
 
 
@@ -152,16 +177,14 @@ end
 function _update()
 
   p:update()
-  local idsToRemove={}
-  for projectile in all(projectiles) do
+  for i=1,#projectiles do
+   local projectile = projectiles[i]
    if (projectile ~= 0) then
     projectile:update()
-    if not projectile.isAlive then idsToRemove[#idsToRemove + 1] = projectile.id end
+    if not projectile.isAlive then
+     projectiles[i] = 0
+    end
    end
-  end
-
-  for id in all(idsToRemove) do
-   projectiles[id] = 0
   end
 
   if btnp(fire1) then
@@ -175,26 +198,29 @@ function _draw()
   map(16,0,0,0,mapH,mapW)
 
   p:draw()
-  for projectile in all(projectiles) do
+  for i=1,#projectiles do
+   local projectile = projectiles[i]
     if (projectile ~= 0) then projectile:draw() end
   end
   local count = 0
-  for projectile in all(projectiles) do
+  for i=1,#projectiles do
+   local projectile = projectiles[i]
     if (projectile ~= 0) then count+=1 end
   end
   local countAlive = 0
-  for projectile in all(projectiles) do
+  for i=1,#projectiles do
+   local projectile = projectiles[i]
     if (projectile ~= 0 and projectile.isAlive) then countAlive+=1 end
   end
   local countDead = 0
-  for projectile in all(projectiles) do
+  for i=1,#projectiles do
+   local projectile = projectiles[i]
     if (projectile ~= 0 and not projectile.isAlive) then countDead+=1 end
   end
-  print(count,0,6,7)
-  print(projectilesCounter,0,12,7)
-  print(#projectiles,0,18,7)
-  print(countAlive,0,24,7)
-  print(countDead,0,30,7)
+  -- print("total:" .. count,0,6,7)
+  -- print("size: " .. #projectiles,0,12,7)
+  -- print("alive:" .. countAlive,0,18,7)
+  -- print("dead: " .. countDead,0,24,7)
 end
 
 
