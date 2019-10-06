@@ -28,6 +28,7 @@ function revealTile(pos, level)
  local lvl = 0
  if fget(tile, 1) then lvl += 1 end
  if fget(tile, 2) then lvl += 2 end
+ if level == nil then level = lvl end
 
  if level >= lvl then
   visibleTiles[getKeyFromPos(pos)] = true
@@ -102,21 +103,26 @@ function createPlayer()
   onCollision=function(self, newPos)
    for i=1,#self.collisionBox do
     local coord = self.collisionBox[i]
-    local tile = mget((newPos.x + coord.x) / 8, (newPos.y + coord.y) / 8)
+    local tilePos = {x=flr((newPos.x + coord.x) / 8),y=flr((newPos.y + coord.y) / 8)}
+    local tile = mget(tilePos.x, tilePos.y)
     if tile == 73 or tile == 73 + 16 or tile == 73 + 32 or tile == 73 + 48 then
      sfx(2)
      self.isAlive = false
      self.deathTime = t()
+     revealTile(tilePos)
+     break
     end
    end
   end,
   update=function(self)
    if self.deathTime ~= nil then return end
-   local tile = mget(self.x / 8, self.y / 8)
+   local tilePos = {x=flr(self.x / 8),y=flr(self.y / 8)}
+   local tile = mget(tilePos.x, tilePos.y)
    if tile == 72 or tile == 72 + 16 or tile == 72 + 32 or tile == 72 + 48 then
     sfx(2)
     self.isAlive = false
     self.deathTime = t()
+    revealTile(tilePos)
    end
 
      local dir = self:getDirection()
@@ -470,4 +476,3 @@ __sfx__
 000a000036560305502d5502855024550225501e5501c5501a55019550165401554013540115400f5300d5300a530085300753005530035300252000520005200052000520005200052000520005200052000520
 __music__
 03 02424344
-
