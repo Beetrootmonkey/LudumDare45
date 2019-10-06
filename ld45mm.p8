@@ -13,18 +13,28 @@ offsetX = 64
 offsetY = 50
 offsetPerOption = 10
 
+function loadGame(param)
+ return function()
+  load("ld45", "main menu", param)
+ end
+end
+
 function _init()
  options = {}
- createOption({label="tutorial"})
- createOption({label="normal"})
- createOption({label="harcore", disabled=true})
+ createOption({label="tutorial", onClick=loadGame("tutorial")})
+ createOption({label="normal", onClick=loadGame("normal")})
+ createOption({label="hardcore", disabled=true, onClick=loadGame("hardcore")})
+ createOption({label="exit", onClick=function() extcmd("shutdown") end, offset = 12})
 end
 
 function createOption(props)
  local option = {
   label = props.label,
-  name = props.name or props.label,
-  disabled = props.disabled or false
+  disabled = props.disabled or false,
+  onClick = function(self)
+   if not self.disabled then props.onClick() end
+  end,
+  offset = props.offset or offsetPerOption
  }
  options[#options + 1] = option
 end
@@ -33,9 +43,11 @@ end
 function _update()
  if btnp(up) then focusedOption -= 1 end
  if btnp(down) then focusedOption += 1 end
- focusedOption %= 3
+ focusedOption %= #options
 
- if btn(fire1) or btn(fire2) then load("ld45", "main menu") end
+ if btn(fire1) or btn(fire2) then
+  options[focusedOption + 1]:onClick()
+ end
 
 end
 
@@ -48,19 +60,17 @@ function _draw()
   local option = options[i]
   local w = #(option.label) * 4 - 1
   local x = offsetX - flr(w / 2)
-  local y = offsetY + i * offsetPerOption
+  local y = offsetY + i * option.offset
 
   if i - 1 == focusedOption then
    rectfill(x - 1, y - 1, x + w, y + 5, blue)
   end
 
   local color = white
-  if option.disabled then color = light_gray end
+  if option.disabled then color = dark_gray end
 
-  print(option.label, x, y, white)
+  print(option.label, x, y, color)
  end
-
- print(focusedOption, 1, 1, white)
 end
 
 
