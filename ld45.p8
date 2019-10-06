@@ -218,11 +218,11 @@ cameraY=peek(0x5f2a)+peek(0x5f2b)*256
 
 -- rect(cameraX, cameraY, cameraX + 128, cameraY + 128, green)
 
-for j=flr((cameraY) / 8) + 1, flr((cameraY + 128) / 8) - 1 do
- for i=flr((cameraX) / 8) + 1, flr((cameraX + 128) / 8) - 1 do
+for j=flr((cameraY) / 8), flr((cameraY + 128) / 8) do
+ for i=flr((cameraX) / 8), flr((cameraX + 128) / 8) do
   local x,y = i * 8, j * 8
   if not isTileVisible({x=i,y=j}) then
-   rect(x, y, x + 7, y + 7, white)
+   rectfill(x, y, x + 7, y + 7, white)
   end
  end
 end
