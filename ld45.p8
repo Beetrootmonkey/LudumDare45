@@ -9,12 +9,20 @@ black,dark_blue,dark_purple,dark_green,brown,dark_gray,light_gray,white,red,oran
 mapH = 127
 mapW = 127
 
+visibleTiles={}
+
+function getKeyFromPos(pos)
+ return pos.x .. " " .. pos.y
+end
+
 function isTileVisible(pos)
- return not mget(pos.x + 16, pos.y) == 3
+ return visibleTiles[getKeyFromPos(pos)] == true
+ -- return not mget(pos.x + 16, pos.y) == 3
 end
 
 function revealTile(pos)
- mset(pos.x + 16, pos.y, 0)
+ visibleTiles[getKeyFromPos(pos)] = true
+ -- mset(pos.x + 16, pos.y, 0)
 end
 
 function createPlayer()
@@ -119,8 +127,6 @@ function createPlayer()
    -- for i=1,3 do
    --  pset(self.x + self.direction.x * i, self.y + self.direction.y * i, green)
    -- end
-   print(self.x .. " " .. self.y,0,0,0)
-   print("Level: " .. self.level,0,6,0)
   end,
   collisionBox={
    {x=-2, y=-2},
@@ -185,6 +191,8 @@ end
 
 function _update()
 
+ camera(p.x - 64, p.y - 64)
+
   p:update()
   for i=1,#projectiles do
    local projectile = projectiles[i]
@@ -202,34 +210,33 @@ function _update()
 end
 
 function _draw()
-  cls()
-  map(0,0,0,0,mapH,mapW)
-  map(16,0,0,0,mapH,mapW)
+ cls()
+ map(0,0,0,0,mapH,mapW)
 
-  p:draw()
-  for i=1,#projectiles do
-   local projectile = projectiles[i]
-    if (projectile ~= 0) then projectile:draw() end
+cameraX=peek(0x5f28)+peek(0x5f29)*256
+cameraY=peek(0x5f2a)+peek(0x5f2b)*256
+
+-- rect(cameraX, cameraY, cameraX + 128, cameraY + 128, green)
+
+for j=flr((cameraY) / 8) + 1, flr((cameraY + 128) / 8) - 1 do
+ for i=flr((cameraX) / 8) + 1, flr((cameraX + 128) / 8) - 1 do
+  local x,y = i * 8, j * 8
+  if not isTileVisible({x=i,y=j}) then
+   rect(x, y, x + 7, y + 7, white)
   end
-  local count = 0
-  for i=1,#projectiles do
-   local projectile = projectiles[i]
-    if (projectile ~= 0) then count+=1 end
-  end
-  local countAlive = 0
-  for i=1,#projectiles do
-   local projectile = projectiles[i]
-    if (projectile ~= 0 and projectile.isAlive) then countAlive+=1 end
-  end
-  local countDead = 0
-  for i=1,#projectiles do
-   local projectile = projectiles[i]
-    if (projectile ~= 0 and not projectile.isAlive) then countDead+=1 end
-  end
-  -- print("total:" .. count,0,6,7)
-  -- print("size: " .. #projectiles,0,12,7)
-  -- print("alive:" .. countAlive,0,18,7)
-  -- print("dead: " .. countDead,0,24,7)
+ end
+end
+
+--map(16,0,0,0,mapH,mapW)
+
+ p:draw()
+ for i=1,#projectiles do
+  local projectile = projectiles[i]
+   if (projectile ~= 0) then projectile:draw() end
+ end
+
+ print(p.x .. " " .. p.y, cameraX, cameraY, green)
+ print("Level: " .. p.level, cameraX, cameraY + 6, green)
 end
 
 
