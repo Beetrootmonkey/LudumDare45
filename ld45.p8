@@ -40,7 +40,6 @@ function createPlayer()
   y=36,
   speed=1,
   move=function(self, newPos)
-   printh("MOVE " .. newPos.x .. "," .. newPos.y)
    self.x = newPos.x
    self.y = newPos.y
   end,
