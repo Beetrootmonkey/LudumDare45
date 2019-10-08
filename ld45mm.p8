@@ -15,7 +15,8 @@ offsetPerOption = 10
 
 function loadGame(param)
  return function()
-  load("#powdazemo", "main menu", param)
+  -- load("#powdazemo-0", "main menu", param)
+   load("#beetrootmonkey_ld45", "main menu", param)
  end
 end
 
@@ -34,7 +35,7 @@ function createOption(props)
   onClick = function(self)
    if not self.disabled then
     props.onClick()
-    sfx(1)
+    -- sfx(1)
    else
    sfx(2)
    end
