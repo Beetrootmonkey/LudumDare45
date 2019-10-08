@@ -16,7 +16,7 @@ offsetPerOption = 10
 function loadGame(param)
  return function()
   -- load("#powdazemo-0", "main menu", param)
-   load("ld45", "main menu", param)
+   load("#beetrootmonkey_ld45", "main menu", param)
  end
 end
 
